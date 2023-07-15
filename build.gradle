@@ -3,7 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.1.1'
     id 'io.spring.dependency-management' version '1.1.0'
     id 'org.graalvm.buildtools.native' version '0.9.20'
-    id 'org.liquibase.gradle' version '2.1.1'
+    id 'org.liquibase.gradle' version '2.2.0'
     id 'nu.studer.jooq' version '8.1'
 }
 
@@ -11,7 +11,7 @@ group = 'owpk'
 version = '0.0.1-SNAPSHOT'
 
 java {
-    sourceCompatibility = '20'
+    sourceCompatibility = '17'
 }
 
 configurations {
@@ -29,15 +29,17 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-jooq'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.liquibase:liquibase-core'
 
     implementation 'org.jooq:jooq-codegen:3.18.2'
     implementation 'org.jooq:jooq-meta-extensions-liquibase:3.18.2'
 
-    liquibaseRuntime group: 'org.liquibase', name: 'liquibase-core', version: '4.8.0'
-    liquibaseRuntime 'org.liquibase:liquibase-groovy-dsl:3.0.0'
+    liquibaseRuntime 'org.liquibase:liquibase-core:4.16.1'
+    liquibaseRuntime 'org.liquibase:liquibase-groovy-dsl:3.0.2'
     liquibaseRuntime 'info.picocli:picocli:4.6.1'
     liquibaseRuntime 'org.postgresql:postgresql:42.3.8'
     liquibaseRuntime group: 'org.yaml', name: 'snakeyaml', version: '2.0'
+
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.3.8'
 
 	compileOnly 'org.projectlombok:lombok'
