@@ -1,25 +1,205 @@
 databaseChangeLog:
-  - changeSet:
-      id: 1652592839476-62
-      author: owpk
-      changes:
-        - createTable:
-            columns:
-              - column:
-                  autoIncrement: true
-                  constraints:
-                    nullable: false
-                    primaryKey: true
-                    primaryKeyName: messages_types_pkey
-                  name: id
-                  type: BIGINT
-              - column:
-                  name: name
-                  type: VARCHAR(255)
-              - column:
-                  name: created_at
-                  type: BIGINT
-              - column:
-                  name: updated_at
-                  type: BIGINT
-            tableName: messages_types
+- changeSet:
+    id: 1689445180521-1
+    author: owpk (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: users_pkey
+            name: id
+            type: BIGINT
+        - column:
+            name: nick_name
+            type: VARCHAR(255)
+        - column:
+            name: email
+            type: VARCHAR(255)
+        - column:
+            name: password
+            type: VARCHAR(500)
+        tableName: users
+- changeSet:
+    id: 1689445180521-2
+    author: owpk (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: card_groups_pkey
+            name: id
+            type: BIGINT
+        - column:
+            name: name
+            type: VARCHAR(50)
+        - column:
+            name: color
+            type: COLORS
+        tableName: card_groups
+- changeSet:
+    id: 1689445180521-3
+    author: owpk (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: email
+        indexName: users_email_idx
+        tableName: users
+        unique: true
+- changeSet:
+    id: 1689445180521-4
+    author: owpk (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: name
+        indexName: card_groups_name_idx
+        tableName: card_groups
+        unique: true
+- changeSet:
+    id: 1689445180521-5
+    author: owpk (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: cards_pkey
+            name: id
+            type: BIGINT
+        - column:
+            name: user_id
+            type: BIGINT
+        - column:
+            name: group_id
+            type: BIGINT
+        - column:
+            name: title
+            type: VARCHAR(50)
+        - column:
+            name: toggle_state
+            type: BOOLEAN
+        - column:
+            name: created_at
+            type: BIGINT
+        - column:
+            name: updated_at
+            type: BIGINT
+        tableName: cards
+- changeSet:
+    id: 1689445180521-6
+    author: owpk (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: notes_pkey
+            name: id
+            type: BIGINT
+        - column:
+            name: card_id
+            type: BIGINT
+        - column:
+            name: content
+            type: TEXT
+        - column:
+            name: draft
+            type: BOOLEAN
+        - column:
+            name: timestamp
+            type: BIGINT
+        tableName: notes
+- changeSet:
+    id: 1689445180521-7
+    author: owpk (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: user_settings_pkey
+            name: id
+            type: BIGINT
+        - column:
+            name: user_id
+            type: BIGINT
+        - column:
+            name: theme
+            type: VARCHAR(255)
+        tableName: user_settings
+- changeSet:
+    id: 1689445180521-8
+    author: owpk (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: group_id
+        baseTableName: cards
+        constraintName: cards_group_id_fkey
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: SET_NULL
+        onUpdate: CASCADE
+        referencedColumnNames: id
+        referencedTableName: card_groups
+        validate: true
+- changeSet:
+    id: 1689445180521-9
+    author: owpk (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: user_id
+        baseTableName: cards
+        constraintName: cards_user_id_fkey
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: CASCADE
+        onUpdate: CASCADE
+        referencedColumnNames: id
+        referencedTableName: users
+        validate: true
+- changeSet:
+    id: 1689445180521-10
+    author: owpk (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: card_id
+        baseTableName: notes
+        constraintName: notes_card_id_fkey
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: CASCADE
+        onUpdate: CASCADE
+        referencedColumnNames: id
+        referencedTableName: cards
+        validate: true
+- changeSet:
+    id: 1689445180521-11
+    author: owpk (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: user_id
+        baseTableName: user_settings
+        constraintName: user_settings_user_id_fkey
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: CASCADE
+        onUpdate: CASCADE
+        referencedColumnNames: id
+        referencedTableName: users
+        validate: true
+
