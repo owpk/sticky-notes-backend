@@ -1,1 +1,16 @@
-
+spring:
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate.jdbc.batch_size: 20
+      hibernate.cache.use_query_cache: false
+      hibernate.cache.use_second_level_cache: false
+      hibernate.cache.use_structured_entries: false
+      hibernate.cache.use_minimal_puts: false
+  datasource:
+    url: ${SN_DB_JDBC}
+    username: ${SN_DB_USERNAME}
+    password: ${SN_DB_PASSWORD}
+    driverClassName: org.postgresql.Driver

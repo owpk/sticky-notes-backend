@@ -1,10 +1,12 @@
+import nu.studer.gradle.jooq.JooqEdition
+
 plugins {
-	id 'java'
+    id 'java'
     id 'org.springframework.boot' version '3.1.1'
     id 'io.spring.dependency-management' version '1.1.0'
     id 'org.graalvm.buildtools.native' version '0.9.20'
     id 'org.liquibase.gradle' version '2.1.1'
-    id 'nu.studer.jooq' version '8.1'
+    id 'nu.studer.jooq' version '8.2.1'
 }
 
 group = 'owpk'
@@ -15,22 +17,20 @@ java {
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-jooq'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-websocket'
-
-    implementation 'org.jooq:jooq-codegen:3.18.2'
-    implementation 'org.jooq:jooq-meta-extensions-liquibase:3.18.2'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-jooq'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
     liquibaseRuntime 'org.liquibase:liquibase-core:4.16.1'
     liquibaseRuntime 'org.liquibase:liquibase-groovy-dsl:3.0.2'
@@ -40,18 +40,21 @@ dependencies {
 
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.3.8'
 
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    jooqGenerator 'org.postgresql:postgresql:42.3.8'
+    jooqGenerator 'jakarta.xml.bind:jakarta.xml.bind-api:3.0.1' // This line was added
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
 
-def jdbcUrl = 'jdbc:postgresql://localhost/sticky_notes'
-def dbUserName = 'postgres'
-def dbPassword = 'postgres'
+def jdbcUrl = System.env.SN_DB_JDBC
+def dbUserName = System.env.SN_DB_USERNAME
+def dbPassword = System.env.SN_DB_PASSWORD
 
 liquibase {
     activities {
@@ -65,28 +68,63 @@ liquibase {
     }
 }
 
-// jooq {
-//     configurations {
-//         main {
-//             generationTool {
-//             generator {
-//                 database {
-//                     name = "org.jooq.meta.extensions.liquibase.LiquibaseDatabase"
-//                         
-//                     properties {
-//                         property {
-//                             key = "rootPath"
-//                             value = "${project.projectDir}/src/main/resources/liquibase"
-//                         }
-// 
-//                         property {
-//                             key = "scripts"
-//                             value = "master.xml"
-//                         }
-//                     }
-//                 }
-//             }
-//             }
-//         }
-//     }
-// }
+jooq {
+    version = '3.18.4'
+    edition = JooqEdition.OSS
+
+    configurations {
+        main {
+
+            generationTool {
+                logging = org.jooq.meta.jaxb.Logging.TRACE
+                jdbc {
+                    driver = 'org.postgresql.Driver'
+                    url = jdbcUrl
+                    user = dbUserName
+                    password = dbPassword
+                    properties {
+                        property {
+                            key = 'ssl'
+                            value = 'false'
+                        }
+                    }
+                }
+
+                generator {
+                    name = 'org.jooq.codegen.DefaultGenerator'
+                    database {
+                        name = 'org.jooq.meta.postgres.PostgresDatabase'
+                        inputSchema = 'public'
+                        forcedTypes {
+                            forcedType {
+                                name = 'varchar'
+                                includeExpression = '.*'
+                                includeTypes = 'JSONB?'
+                            }
+                            forcedType {
+                                name = 'varchar'
+                                includeExpression = '.*'
+                                includeTypes = 'INET'
+                            }
+                        }
+                    }
+
+                    generate {
+                        relations = true
+                        deprecated = false
+                        records = true
+                        immutablePojos = false
+                        daos = true
+                        fluentSetters = true
+                    }
+
+                    target {
+                        packageName = project.group
+                        directory = 'build/generated-src/jooq/main'
+                    }
+                    strategy.name = 'org.jooq.codegen.DefaultGeneratorStrategy'
+                }
+            }
+        }
+    }
+}
